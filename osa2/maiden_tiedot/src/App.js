@@ -15,7 +15,7 @@ const CountryInfo = ({ country }) => (
     <p>population {country.population}</p>
     <h2>languages</h2> 
     <ul>{country.languages.map(language => <li>{language.name}</li>)}</ul>
-    <img src={country.flag} width="10%" height="10%"/> 
+    <img src={country.flag} width="10%" height="10%" alt='flag'/> 
   </div> 
 )
 
@@ -39,8 +39,7 @@ const Filter = ({newFilter, handleFilterChange}) => (
 const App = () => {
 
   const [countries, setCountries] = useState([])
-  const [newFilter, setNewFilter ] = useState('')
-
+  const [newFilter, setNewFilter] = useState('')
 
   useEffect(() => {
     axios
@@ -53,6 +52,7 @@ const App = () => {
   const countriesToShow  = countries.filter(country => country.name.toLowerCase().includes(newFilter.toLowerCase())) 
 
   const handleShowClick = (name) => {
+    console.log(name, '2')
     const handler = () => setNewFilter(name)
       return handler
   }
