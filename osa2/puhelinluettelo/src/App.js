@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
-const Person = ({person}) => (
-  <p>{person.name} {person.number}</p>
+const Person = ({person, deleteClick }) => (
+  <p>{person.name} {person.number} <button onClick={deleteClick}>delete</button></p>
 )
 
 const Filter = ({newFilter, handleFilterChange}) => (
@@ -19,9 +19,9 @@ const PersonForm = ({addPerson, newName, handleNameChange, newNumber, handleNumb
   </form>
 )
 
-const Persons = ({ personsToShow }) => (
+const Persons = ({ personsToShow, deleteClick }) => (
   <div>
-    {personsToShow.map(person => <Person key={person.name} person={person}/>)}
+    {personsToShow.map(person => <Person key={person.name} person={person} deleteClick={() => deleteClick(person.id)}/>)}
   </div>
 )
 
@@ -32,11 +32,10 @@ const App = () => {
   const [ newFilter, setNewFilter ] = useState('')
   
   useEffect(() =>{
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response =>{
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(persons =>{
+        setPersons(persons)
       })
   },[])
 
@@ -57,6 +56,14 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
+  const handleDeleteClick = (id) => {
+    console.log(`${id} delete button clicked`)
+    personService
+      .deletePerson(id)
+      .then(returnedThing => {
+        setPersons(persons.filter(n => n.id !== id))
+      })
+  }
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -69,9 +76,14 @@ const App = () => {
       window.alert(`${newName} is already added to phonebook`)
       console.log({})
     } else {
-      setPersons(persons.concat(nameObject))
-      setNewName('')
-      setNewNumber('')
+      personService
+        .addPerson(nameObject)
+        .then(returnedPerson => {
+          console.log(returnedPerson)
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
@@ -88,7 +100,7 @@ const App = () => {
       handleNumberChange={handleNumberChange} 
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} deleteClick={handleDeleteClick} />
     </div>
   )
 
