@@ -21,7 +21,7 @@ const PersonForm = ({addPerson, newName, handleNameChange, newNumber, handleNumb
 
 const Persons = ({ personsToShow, deleteClick }) => (
   <div>
-    {personsToShow.map(person => <Person key={person.name} person={person} deleteClick={() => deleteClick(person.id)}/>)}
+    {personsToShow.map(person => <Person key={person.name} person={person} deleteClick={() => deleteClick(person)}/>)}
   </div>
 )
 
@@ -56,13 +56,15 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
-  const handleDeleteClick = (id) => {
-    console.log(`${id} delete button clicked`)
-    personService
-      .deletePerson(id)
+  const handleDeleteClick = (person) => {
+    console.log(`${person.id} delete button clicked`)
+    if (window.confirm(`delete ${person.name}?`)) {
+      personService
+      .deletePerson(person.id)
       .then(returnedThing => {
-        setPersons(persons.filter(n => n.id !== id))
+        setPersons(persons.filter(n => n.id !== person.id))
       })
+    }
   }
 
   const addPerson = (event) => {
