@@ -25,11 +25,25 @@ const Persons = ({ personsToShow, deleteClick }) => (
   </div>
 )
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className="message">
+      {message}
+    </div>
+  )
+
+}
+
+
 const App = () => {
   const [ persons, setPersons] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
+  const [message, setMessage] = useState(null)
   
   useEffect(() =>{
     personService
@@ -63,6 +77,12 @@ const App = () => {
       .deletePerson(person.id)
       .then(returnedThing => {
         setPersons(persons.filter(n => n.id !== person.id))
+        setMessage(
+          `${person.name}'s number has been deleted`
+          )
+        setTimeout(() => {
+            setMessage(null)
+          }, 2000)
       })
     }
   }
@@ -87,6 +107,12 @@ const App = () => {
             setNewName('')
             setNewNumber('')
             setPersons(persons.map(person => person.id !== changedPerson.id ? person : changedPerson ))
+            setMessage(
+              `${returnedPerson.name}'s number has been updated`
+              )
+            setTimeout(() => {
+                setMessage(null)
+              }, 2000)
           })
       }
     } else {
@@ -97,6 +123,12 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+          setMessage(
+            `Added ${returnedPerson.name}`
+            )
+          setTimeout(() => {
+              setMessage(null)
+            }, 2000)
         })
     }
   }
@@ -104,6 +136,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={message} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
       <PersonForm 
