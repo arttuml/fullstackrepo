@@ -34,7 +34,6 @@ const Notification = ({ message }) => {
       {message}
     </div>
   )
-
 }
 
 const ErrorNotification = ({ errorMessage }) => {
@@ -152,6 +151,13 @@ const App = () => {
           setTimeout(() => {
               setMessage(null)
             }, 2000)
+        })
+        .catch(error => {
+          const message = error.response.data.error
+          setErrorMessage(message)
+          setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
         })
     }
   }
