@@ -2,9 +2,10 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJhbmFhbmkiLCJpZCI6IjYxNWFmZWQ5ZjI1YjBmYzEzYjU1MDMyYiIsImlhdCI6MTYzMzM1MzQ4Mn0.OlJlF1DYlfJkoFCg1d_-ahWrKhuVzEYeP3s6iz6c03k
 
+
 {
-    "title": "helsd3delmä blogi",
-    "author": "Pen23tsti blogaaja",
-    "url": "hedeBlogi34.fi",
-    "likes": 633
+    "title": "testing 1",
+    "author": "testing 1",
+    "url": "testing1.fi",
+    "likes": 666
 }

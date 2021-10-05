@@ -31,18 +31,43 @@ describe('a definition of data', () => {
 })
 
 describe('Add, update and delete', () => {
+
+  let token
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('salainensana', 10)
+    const user = new User({ username: 'root', name: 'super', passwordHash })
+    
+    await user.save()
+
+    const user1 = {
+      username: 'root',
+      password: 'salainensana'
+    }
+    const response = await api
+      .post('/api/login')
+      .send(user1)
+    
+    token = response.body.token.toString()
+
+  })
+
   test('a valid blog can be added', async () => {
+
     const newBlog = {
       title: 'uusi blogi',
       author: 'uusi blogaaja',
       url: 'www.uusiblogi.fi',
       likes: 1
     }
-  
+    
     await api
       .post('/api/blogs')
+      .set('Authorization',`bearer ${token}`)
       .send(newBlog)
-      .expect(201)
+      .expect(200)
       .expect('Content-Type', /application\/json/)
   
     const blogsAtEnd = await helper.blogsInDb()
@@ -52,6 +77,23 @@ describe('Add, update and delete', () => {
     expect(titles).toContain(newBlog.title)
   })
 
+  test('fails with statuscode 401 Unauthorized, if token missing', async () => {
+
+    const newBlog = {
+      title: 'uusi blogi',
+      author: 'uusi blogaaja',
+      url: 'www.uusiblogi.fi',
+      likes: 1
+    }
+    
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+  })
+
   test('fails with statuscode 400 Bad request, if adding data invalid', async () => {
     const newBlog = {
       likes: 1
@@ -59,6 +101,7 @@ describe('Add, update and delete', () => {
   
     await api
       .post('/api/blogs')
+      .set('Authorization',`bearer ${token}`)
       .send(newBlog)
       .expect(400)
   })
@@ -74,8 +117,9 @@ describe('Add, update and delete', () => {
   
     await api
       .post('/api/blogs')
+      .set('Authorization',`bearer ${token}`)
       .send(undefinedLikesBlog)
-      .expect(201)
+      .expect(200)
       .expect('Content-Type', /application\/json/)
   
     const blogsAtEnd = await helper.blogsInDb()
@@ -84,17 +128,34 @@ describe('Add, update and delete', () => {
     expect(likes).toEqual(0)
   })
   
-  test('a blog can be delete', async () => {
+  test('a blog can be deleted', async () => {
+    const newBlog = {
+      title: 'uusi blogi',
+      author: 'uusi blogaaja',
+      url: 'www.uusiblogi.fi',
+      likes: 10
+    }
+  
+    await Blog.deleteMany({})
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization',`bearer ${token}`)
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
     const blogsAtStart = await helper.blogsInDb()
     const blogsToDelete = blogsAtStart[0]
   
     await api
       .delete(`/api/blogs/${blogsToDelete.id}`)
+      .set('Authorization',`bearer ${token}`)
       .expect(204)
   
     const blogsAtEnd = await helper.blogsInDb()
   
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
   
     const titles = blogsAtEnd.map(b => b.title)
   
@@ -127,8 +188,8 @@ describe('when there is initially one user at db', () => {
   beforeEach(async () => {
     await User.deleteMany({})
 
-    const passwordHash = await bcrypt.hash('salainensanan', 10)
-    const user = new User({ username: 'root', name: 'pekka', passwordHash })
+    const passwordHash = await bcrypt.hash('salainensana', 10)
+    const user = new User({ username: 'root', name: 'super', passwordHash })
 
     await user.save()
   })
