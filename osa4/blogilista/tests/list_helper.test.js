@@ -95,3 +95,7 @@ describe('favorite blog', () => {
     expect(result).toEqual(favoriteBlog)
   })
 })
+
+test('mostlikes', () => {
+  const result = listHelper.mostLikes2(blogs)
+})
