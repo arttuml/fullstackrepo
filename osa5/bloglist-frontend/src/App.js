@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -10,9 +11,6 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotificatin] = useState(null)
 
@@ -37,19 +35,11 @@ const App = () => {
     }, 4000)
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: title,
-      author: author,
-      url: url,
-    }
+  const addBlog = async ( blogObject ) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')  
+
     } catch (expection) {
       notifyWith(`unable to add the blog, did you forgot to add the name or author?`,'error')
     }
@@ -96,17 +86,9 @@ const App = () => {
   )
 
   const blogForm = () => (
-    <div>
-      <BlogForm
-      handleSumbmit={addBlog}
-      handleTitleChange={({target}) => setTitle(target.value)}
-      handleAuthorChange={({target}) => setAuthor(target.value)}
-      handleUrlChange={({target}) => setUrl(target.value)}
-      title={title}
-      author={author}
-      url={url}
-      />
-    </div>
+    <Togglable buttonlabel='create new blog' >
+      <BlogForm createBlog={addBlog}/>
+    </Togglable>
   )
 
   return (
