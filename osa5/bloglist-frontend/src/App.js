@@ -17,7 +17,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -42,10 +42,10 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog))
       notifyWith('blog added')
     } catch (expection) {
-      notifyWith(`unable to add the blog, did you forgot to add the name or author?`,'error')
+      notifyWith('unable to add the blog, did you forgot to add the name or author?','error')
     }
   }
-  
+
   const removeBlog = async (id) => {
     try {
       await blogService.remove(id)
@@ -66,7 +66,7 @@ const App = () => {
     }
   }
 
- 
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -91,15 +91,15 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
   }
-  
+
   const loginForm = () => (
     <div>
-      <LoginForm 
-      handleSubmit={handleLogin}
-      handleUsernameChange={({target}) => setUsername(target.value)}
-      handlePasswordChange={({target}) => setPassword(target.value)}
-      username={username}
-      password={password}
+      <LoginForm
+        handleSubmit={handleLogin}
+        handleUsernameChange={({ target }) => setUsername(target.value)}
+        handlePasswordChange={({ target }) => setPassword(target.value)}
+        username={username}
+        password={password}
       />
     </div>
   )
