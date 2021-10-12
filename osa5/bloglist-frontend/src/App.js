@@ -25,6 +25,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   },[])
 
@@ -39,11 +40,31 @@ const App = () => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
+      notifyWith('blog added')
     } catch (expection) {
       notifyWith(`unable to add the blog, did you forgot to add the name or author?`,'error')
     }
-    notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+  }
+  
+  const removeBlog = async (id) => {
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      notifyWith('blog deleted')
+    } catch (expection) {
+      notifyWith('unable to delete blog')
     }
+  }
+
+  const updateBlog = async (id, newObject) => {
+    try {
+      const updatedBlog =  await blogService.update(id, newObject)
+      setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
+      notifyWith('blog updated')
+    } catch (expection) {
+      notifyWith('unable to update the blog')
+    }
+  }
 
  
   const handleLogin = async (event) => {
@@ -98,7 +119,7 @@ const App = () => {
           <h2>blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogForm()}
-          {blogs.map(blog => <Blog key={blog.id} blog={blog} />
+          {blogs.sort((a,b) => b.likes - a.likes).map(blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog} updateBlog={updateBlog} />
           )}
         </div>
       }
