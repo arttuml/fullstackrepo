@@ -35,11 +35,10 @@ const App = () => {
     }, 4000)
   }
 
-  const addBlog = async ( blogObject ) => {
+  const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
-
     } catch (expection) {
       notifyWith(`unable to add the blog, did you forgot to add the name or author?`,'error')
     }
@@ -54,7 +53,6 @@ const App = () => {
       const user = await loginService.login({
         username, password
       })
-
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
