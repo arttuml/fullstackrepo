@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, removeBlog, updateBlog }) => {
+const Blog = ({ blog, removeBlog, updateBlog, user }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -9,9 +9,6 @@ const Blog = ({ blog, removeBlog, updateBlog }) => {
     borderWidth: 1,
     marginBottom: 5
   }
-
-  const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-  const user = JSON.parse(loggedUserJSON)
 
   const removeButtonStyle = {
     color: 'red',
@@ -46,11 +43,11 @@ const Blog = ({ blog, removeBlog, updateBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      <div style={hideWhenVisible}>
+    <div id="blog" style={blogStyle}>
+      <div style={hideWhenVisible} className="blogInfo">
         {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
       </div>
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className="moreBlogInfo">
         {blog.title} {blog.author} <button onClick={toggleVisibility}>hide</button>
         <br /> {blog.url}
         <br /> likes {blog.likes} <button onClick={addLike}>like</button>

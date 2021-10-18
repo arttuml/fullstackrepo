@@ -29,7 +29,7 @@ const BlogForm = ({ createBlog }) => {
           <input
             type="text"
             value={title}
-            name="title"
+            id="title"
             onChange={({ target }) => setTitle(target.value)}/>
         </div>
         <div>
@@ -37,7 +37,7 @@ const BlogForm = ({ createBlog }) => {
           <input
             type="text"
             value={author}
-            name="author"
+            id="author"
             onChange={({ target }) => setAuthor(target.value)}/>
         </div>
         <div>
@@ -45,10 +45,10 @@ const BlogForm = ({ createBlog }) => {
           <input
             type="text"
             value={url}
-            name="url"
+            id="url"
             onChange={({ target }) => setUrl(target.value)}/>
         </div>
-        <button type="submit">create</button>
+        <button id="create-blog-button" type="submit">create</button>
       </form>
     </div>
   )
