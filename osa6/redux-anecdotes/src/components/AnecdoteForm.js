@@ -3,11 +3,10 @@ import { createAnecdote } from '../reducers/anecdoteReducer'
 import { useDispatch } from 'react-redux'
 import { addNotification, resetNotification } from '../reducers/notificationReducer'
 
-
 const AnecdoteForm = (props) => {
   const dispatch = useDispatch()
 
-  const add = (event) => {
+  const add = async (event) => {
       event.preventDefault()
       const content = event.target.anecdote.value
       event.target.anecdote.value = ''
