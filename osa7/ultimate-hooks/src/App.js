@@ -19,6 +19,9 @@ const useField = (type) => {
 
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
+  useEffect(() => {
+    axios.get(baseUrl).then(response => setResources(response.data))
+  },[baseUrl])
 
   const create = async (resource) => {
     const response = await axios.post(baseUrl, resource)
@@ -51,12 +54,6 @@ const App = () => {
 
   const [notes, noteService] = useResource('http://localhost:3005/notes')
   const [persons, personService] = useResource('http://localhost:3005/persons')
-
-  useEffect(() => {
-    noteService.getAll()
-    personService.getAll()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
 
   const handleNoteSubmit = (event) => {
     event.preventDefault()
