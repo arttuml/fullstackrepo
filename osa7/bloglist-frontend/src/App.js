@@ -6,7 +6,7 @@ import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import { notify, resetNotification } from './reducers/notificationReducer'
+import { notify } from './reducers/notificationReducer'
 import { createBlog, initializeBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
 import { useSelector, useDispatch } from 'react-redux'
@@ -36,9 +36,6 @@ const App = () => {
 
   const notifyWith = (message, type='success') => {
     dispatch(notify({ message, type }))
-    setTimeout(() => {
-      dispatch(resetNotification())
-    }, 4000)
   }
 
   const addBlog = async (blogObject) => {
