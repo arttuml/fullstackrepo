@@ -6,17 +6,22 @@ import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { notify, resetNotification } from './reducers/notificationReducer'
+import { createBlog, initializeBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
+import { login, logout } from './reducers/userReducer'
+import { useSelector, useDispatch } from 'react-redux'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
-  const [notification, setNotificatin] = useState(null)
+
+  const dispatch = useDispatch()
+  const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      dispatch(initializeBlogs( blogs ))
     )
   }, [])
 
@@ -24,22 +29,22 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(login(user))
       blogService.setToken(user.token)
     }
   },[])
 
   const notifyWith = (message, type='success') => {
-    setNotificatin({ message, type })
+    dispatch(notify({ message, type }))
     setTimeout(() => {
-      setNotificatin(null)
+      dispatch(resetNotification())
     }, 4000)
   }
 
   const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(returnedBlog))
+      dispatch(createBlog(returnedBlog))
       notifyWith('blog added')
     } catch (expection) {
       notifyWith('unable to add the blog, did you forgot to add the name or author?','error')
@@ -49,7 +54,7 @@ const App = () => {
   const removeBlog = async (id) => {
     try {
       await blogService.remove(id)
-      setBlogs(blogs.filter(blog => blog.id !== id))
+      dispatch(deleteBlog(id))
       notifyWith('blog deleted')
     } catch (expection) {
       notifyWith('unable to delete blog')
@@ -59,7 +64,7 @@ const App = () => {
   const updateBlog = async (id, newObject) => {
     try {
       const updatedBlog =  await blogService.update(id, newObject)
-      setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
+      dispatch(likeBlog(updatedBlog))
       notifyWith('blog updated')
     } catch (expection) {
       notifyWith('unable to update the blog')
@@ -79,7 +84,7 @@ const App = () => {
       )
 
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(login(user))
       setUsername('')
       setPassword('')
     } catch (expection) {
@@ -89,7 +94,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    dispatch(logout())
   }
 
   const loginForm = () => (
@@ -112,7 +117,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification notification={notification} />
+      <Notification />
       {user === null ?
         loginForm() :
         <div>
