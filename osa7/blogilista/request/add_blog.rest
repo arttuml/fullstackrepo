@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJlbnR0aSIsImlkIjoiNjE1YWZlZTNmMjViMGZjMTNiNTUwMzJmIiwiaWF0IjoxNjMzNDM0OTk4fQ.q5rbCXevoUFxL2a08eQn6JZU24XTNAOPDW2CyMwEbvo
+
+{
+    "title": "testing blogi",
+    "author": "testi timo",
+    "url": "testing2.fi",
+    "likes": 666
+}
