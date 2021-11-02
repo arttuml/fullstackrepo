@@ -9,12 +9,12 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import User from './components/User'
 import { notify } from './reducers/notificationReducer'
-import { createBlog, initializeBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
+import { createBlog, initializeBlogs } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Switch, Route,
-  //useRouteMatch
+  Link
 } from 'react-router-dom'
 import { initializeUsers } from './reducers/usersReducer'
 
@@ -25,7 +25,6 @@ const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
   const user = useSelector(state => state.user)
-  //const users = useSelector(state => state.users)
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -54,27 +53,6 @@ const App = () => {
       notifyWith('unable to add the blog, did you forgot to add the name or author?','error')
     }
   }
-
-  const removeBlog = async (id) => {
-    try {
-      await blogService.remove(id)
-      dispatch(deleteBlog(id))
-      notifyWith('blog deleted')
-    } catch (expection) {
-      notifyWith('unable to delete blog')
-    }
-  }
-
-  const updateBlog = async (id, newObject) => {
-    try {
-      const updatedBlog =  await blogService.update(id, newObject)
-      dispatch(likeBlog(updatedBlog))
-      notifyWith('blog updated')
-    } catch (expection) {
-      notifyWith('unable to update the blog')
-    }
-  }
-
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -121,39 +99,58 @@ const App = () => {
     )
   }
 
-  //const match = useRouteMatch('/users/:id')
-  //const matchUser = match
-  //  ? users.find(user => user.id === Number(match.params.id))
-  //  : null
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+
+  const padding = {
+    padding: 10
+  }
+
+  const navbar = {
+    backgroundColor: '#a8b0b3',
+    padding: 5
+  }
 
   return (
     <div>
-      <div>
-        <Notification />
-        {user === null ?
-          loginForm() :
+      <Notification />
+      {user === null ?
+        loginForm() :
+        <div>
           <div>
-            <h2>blogs</h2>
-            <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+            <div style={navbar}>
+              <Link style={padding} to="/">blogs</Link>
+              <Link style={padding} to="/users">users</Link>
+              <em style={padding}>{user.name} logged in <button onClick={handleLogout}>logout</button></em>
+            </div>
+            <h2>blog app</h2>
           </div>
-        }
-      </div>
-      <Switch>
-        <Route path="/blogs/:id">
-          <p>lalal</p>
-        </Route>
-        <Route path="/users/:id">
-          <User />
-        </Route>
-        <Route path="/users">
-          <Users />
-        </Route>
-        <Route path="/">
-          {blogForm()}
-          {blogs.map(blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog} updateBlog={updateBlog} user={user} />
-          )}
-        </Route>
-      </Switch>
+          <Switch>
+            <Route path="/blogs/:id">
+              <Blog />
+            </Route>
+            <Route path="/users/:id">
+              <User />
+            </Route>
+            <Route path="/users">
+              <Users />
+            </Route>
+            <Route path="/">
+              {blogForm()}
+              {blogs.map(blog =>
+                <div key={blog.id} style={blogStyle}>
+                  <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
+                </div>
+              )}
+            </Route>
+          </Switch>
+        </div>
+      }
     </div>
   )
 }

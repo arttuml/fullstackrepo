@@ -43,7 +43,7 @@ export const likeBlog = (blog) => {
   }
 }
 
-export const deleteBlog = (id) => {
+export const removeBlog = (id) => {
   return {
     type: 'REMOVE',
     id

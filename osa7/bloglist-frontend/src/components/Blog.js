@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import blogService from '../services/blogs'
+import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { notify } from '../reducers/notificationReducer'
 
-const Blog = ({ blog, removeBlog, updateBlog, user }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
+const Blog = () => {
+  const dispatch = useDispatch()
+  const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
+  const id = useParams().id
+  const blog = blogs.find(n => n.id === id)
+
+  if (!blog || !user) {
+    return null
   }
 
   const removeButtonStyle = {
@@ -15,23 +21,21 @@ const Blog = ({ blog, removeBlog, updateBlog, user }) => {
     display: user.username === blog.user.username ? '' : 'none'
   }
 
-  const [visible, setVisible] = useState(false)
-
-  const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
-
-  const deleteBlog = () => {
+  const deleteBlog = async () => {
     const ok = window.confirm(`Remoe blog ${blog.title} by ${blog.author}?`)
     if (ok) {
-      removeBlog(blog.id)
+      try {
+        await blogService.remove(id)
+        dispatch(removeBlog(id))
+        dispatch(notify({ message:'blog deleted',type:'success' }))
+      } catch (expection) {
+        dispatch(notify({ message:'unable to delete the blog',type:'error' }))
+      }
     }
   }
 
-  const addLike = () => {
+
+  const addLike = async () => {
     const newObject = {
       user: blog.user.id,
       title: blog.title,
@@ -39,29 +43,24 @@ const Blog = ({ blog, removeBlog, updateBlog, user }) => {
       url: blog.url,
       likes: blog.likes + 1
     }
-    updateBlog(blog.id, newObject)
+    try {
+      const updatedBlog =  await blogService.update(id, newObject)
+      dispatch(likeBlog(updatedBlog))
+      dispatch(notify({ message:'blog updated',type:'success' }))
+    } catch (expection) {
+      dispatch(notify({ message:'unable to update the blog',type:'error' }))
+    }
   }
 
   return (
-    <div id="blog" style={blogStyle}>
-      <div style={hideWhenVisible} className="blogInfo">
-        {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
-      </div>
-      <div style={showWhenVisible} className="moreBlogInfo">
-        {blog.title} {blog.author} <button onClick={toggleVisibility}>hide</button>
-        <br /> {blog.url}
-        <br /> likes {blog.likes} <button onClick={addLike}>like</button>
-        <br /> {blog.user.name}
-        <br /> <button style={removeButtonStyle} onClick={deleteBlog}>remove</button>
-      </div>
+    <div>
+      <h1>{blog.title} by {blog.author}</h1>
+      <a href={blog.url}>{blog.url}</a>
+      <p>{blog.likes} likes<button onClick={addLike}>like</button></p>
+      <p>added by {blog.user.name}</p>
+      <button onClick={deleteBlog} style={removeButtonStyle}>remove</button>
     </div>
   )
-}
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  removeBlog: PropTypes.func.isRequired,
-  updateBlog: PropTypes.func.isRequired
 }
 
 export default Blog
