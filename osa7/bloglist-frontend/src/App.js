@@ -7,14 +7,16 @@ import Togglable from './components/Togglable'
 import Users from './components/Users'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import User from './components/User'
 import { notify } from './reducers/notificationReducer'
 import { createBlog, initializeBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  BrowserRouter as Router,
-  Switch, Route
+  Switch, Route,
+  //useRouteMatch
 } from 'react-router-dom'
+import { initializeUsers } from './reducers/usersReducer'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -23,9 +25,11 @@ const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
   const user = useSelector(state => state.user)
+  //const users = useSelector(state => state.users)
 
   useEffect(() => {
     dispatch(initializeBlogs())
+    dispatch(initializeUsers())
   }, [])
 
   useEffect(() => {
@@ -109,14 +113,21 @@ const App = () => {
     </div>
   )
 
-  const blogForm = () => (
-    <Togglable buttonlabel='create new blog' >
-      <BlogForm createBlog={addBlog}/>
-    </Togglable>
-  )
+  const blogForm = () => {
+    return(
+      <Togglable buttonlabel='create new blog' >
+        <BlogForm createBlog={addBlog}/>
+      </Togglable>
+    )
+  }
+
+  //const match = useRouteMatch('/users/:id')
+  //const matchUser = match
+  //  ? users.find(user => user.id === Number(match.params.id))
+  //  : null
 
   return (
-    <Router>
+    <div>
       <div>
         <Notification />
         {user === null ?
@@ -124,13 +135,16 @@ const App = () => {
           <div>
             <h2>blogs</h2>
             <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-            {blogForm()}
-            {blogs.map(blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog} updateBlog={updateBlog} user={user} />
-            )}
           </div>
         }
       </div>
       <Switch>
+        <Route path="/blogs/:id">
+          <p>lalal</p>
+        </Route>
+        <Route path="/users/:id">
+          <User />
+        </Route>
         <Route path="/users">
           <Users />
         </Route>
@@ -140,7 +154,7 @@ const App = () => {
           )}
         </Route>
       </Switch>
-    </Router>
+    </div>
   )
 }
 
