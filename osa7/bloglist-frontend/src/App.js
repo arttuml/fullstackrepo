@@ -4,12 +4,17 @@ import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
+import Users from './components/Users'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { notify } from './reducers/notificationReducer'
 import { createBlog, initializeBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
 import { useSelector, useDispatch } from 'react-redux'
+import {
+  BrowserRouter as Router,
+  Switch, Route
+} from 'react-router-dom'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -20,9 +25,7 @@ const App = () => {
   const user = useSelector(state => state.user)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      dispatch(initializeBlogs( blogs ))
-    )
+    dispatch(initializeBlogs())
   }, [])
 
   useEffect(() => {
@@ -113,19 +116,31 @@ const App = () => {
   )
 
   return (
-    <div>
-      <Notification />
-      {user === null ?
-        loginForm() :
-        <div>
-          <h2>blogs</h2>
-          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+    <Router>
+      <div>
+        <Notification />
+        {user === null ?
+          loginForm() :
+          <div>
+            <h2>blogs</h2>
+            <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+            {blogForm()}
+            {blogs.map(blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog} updateBlog={updateBlog} user={user} />
+            )}
+          </div>
+        }
+      </div>
+      <Switch>
+        <Route path="/users">
+          <Users />
+        </Route>
+        <Route path="/">
           {blogForm()}
-          {blogs.sort((a,b) => b.likes - a.likes).map(blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog} updateBlog={updateBlog} user={user} />
+          {blogs.map(blog => <Blog key={blog.id} blog={blog} removeBlog={removeBlog} updateBlog={updateBlog} user={user} />
           )}
-        </div>
-      }
-    </div>
+        </Route>
+      </Switch>
+    </Router>
   )
 }
 
