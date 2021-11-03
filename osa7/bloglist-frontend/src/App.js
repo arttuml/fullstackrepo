@@ -17,6 +17,8 @@ import {
   Link
 } from 'react-router-dom'
 import { initializeUsers } from './reducers/usersReducer'
+import { initializeComments } from './reducers/commentReducers'
+import { Table, Nav, Navbar, Button, Container } from 'react-bootstrap'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -29,6 +31,7 @@ const App = () => {
   useEffect(() => {
     dispatch(initializeBlogs())
     dispatch(initializeUsers())
+    dispatch(initializeComments())
   }, [])
 
   useEffect(() => {
@@ -99,37 +102,40 @@ const App = () => {
     )
   }
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-
   const padding = {
     padding: 10
   }
 
-  const navbar = {
-    backgroundColor: '#a8b0b3',
-    padding: 5
-  }
-
   return (
-    <div>
+    <div className="container">
       <Notification />
       {user === null ?
         loginForm() :
         <div>
-          <div>
-            <div style={navbar}>
-              <Link style={padding} to="/">blogs</Link>
-              <Link style={padding} to="/users">users</Link>
-              <em style={padding}>{user.name} logged in <button onClick={handleLogout}>logout</button></em>
-            </div>
-            <h2>blog app</h2>
-          </div>
+          <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+            <Container>
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav">
+                <Navbar.Brand href="#">Blog app</Navbar.Brand>
+                <Nav className="mr-auto">
+                  <Nav.Link href="#" as="span">
+                    <Link style={padding} to="/">home</Link>
+                  </Nav.Link>
+                  <Nav.Link href="#" as="span">
+                    <Link style={padding} to="/user">notes</Link>
+                  </Nav.Link>
+                  <Nav.Link href="#" as="span">
+                    <Link style={padding} to="/users">users</Link>
+                  </Nav.Link>
+                  <Navbar.Collapse className="justify-content-end">
+                    <Navbar.Text>
+                      <em style={padding}>{user.name} logged in <Button variant="primary" size="sm" onClick={handleLogout}>logout</Button></em>
+                    </Navbar.Text>
+                  </Navbar.Collapse>
+                </Nav>
+              </Navbar.Collapse>
+            </Container>
+          </Navbar>
           <Switch>
             <Route path="/blogs/:id">
               <Blog />
@@ -142,11 +148,22 @@ const App = () => {
             </Route>
             <Route path="/">
               {blogForm()}
-              {blogs.map(blog =>
-                <div key={blog.id} style={blogStyle}>
-                  <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
-                </div>
-              )}
+              <Table striped>
+                <tbody>
+                  {blogs.map(blog =>
+                    <tr key={blog.id} >
+                      <td>
+                        <Link to={`/blogs/${blog.id}`}>
+                          {blog.title} by {blog.author}
+                        </Link>
+                      </td>
+                      <td>
+                        {blog.user.name}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
             </Route>
           </Switch>
         </div>

@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom'
 import blogService from '../services/blogs'
 import { likeBlog, removeBlog } from '../reducers/blogReducer'
 import { notify } from '../reducers/notificationReducer'
+import { createComment } from '../reducers/commentReducers'
+import { Button, Form, Row, Col } from 'react-bootstrap'
 
 const Blog = () => {
   const dispatch = useDispatch()
@@ -11,6 +13,7 @@ const Blog = () => {
   const user = useSelector(state => state.user)
   const id = useParams().id
   const blog = blogs.find(n => n.id === id)
+  const comments = useSelector(state => state.comments).filter(c => c.blog.id===id)
 
   if (!blog || !user) {
     return null
@@ -60,7 +63,8 @@ const Blog = () => {
       content
     }
     try {
-      await blogService.createComment(id, newObject)
+      const newComment = await blogService.createComment(id, newObject)
+      dispatch(createComment(newComment))
       dispatch(notify({ message:'comment added',type:'success' }))
     } catch (expection) {
       dispatch(notify({ message:'unable to add the comment',type:'error' }))
@@ -71,19 +75,25 @@ const Blog = () => {
     <div>
       <h1>{blog.title} by {blog.author}</h1>
       <a href={blog.url}>{blog.url}</a>
-      <p>{blog.likes} likes<button onClick={addLike}>like</button></p>
+      <p>{blog.likes} likes<Button variant="success" size="sm" onClick={addLike}>like</Button></p>
       <p>added by {blog.user.name}</p>
       <button onClick={deleteBlog} style={removeButtonStyle}>remove</button>
       <h2>comments</h2>
-      <form onSubmit={addComment}>
-        <input name="comment" />
-        <button type="submit">comment</button>
-      </form>
-      {blog.comments.length === 0 ?
+      <Form onSubmit={addComment}>
+        <Row>
+          <Col>
+            <Form.Control name="comment" />
+          </Col>
+          <Col>
+            <Button variaty="primary" type="submit">comment</Button>
+          </Col>
+        </Row>
+      </Form>
+      {comments.length === 0 ?
         <p>no comments</p> :
         <div>
           <ul>
-            {blog.comments.map(comment =>
+            {comments.map(comment =>
               <li key={comment.id}>{comment.content}</li>) }
           </ul>
         </div>}
