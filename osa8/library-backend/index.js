@@ -80,20 +80,23 @@ const resolvers = {
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
       if (!args.genre && !args.author) {
-        return await Book.find({})
+        return await Book.find({}).populate('author')
       }
       if (args.author && args.genre) {
         const author = await Author.findOne({ name: args.author })
-        return await Book.find({ author: author}).find({ genres: { $in: args.genre }})
+        return await Book
+          .find({ author: author})
+          .find({ genres: { $in: args.genre }})
+          .populate('author')
       }
 
       let books = await Book.find({})
       if (args.author) {
         const author = await Author.findOne({ name: args.author })
-        books = await Book.find({ author: author})
+        books = await Book.find({ author: author}).populate('author')
       }
       if (args.genre) {
-        books = await Book.find({ genres: { $in: args.genre }})
+        books = await Book.find({ genres: { $in: args.genre }}).populate('author')
       }
       return books
     },

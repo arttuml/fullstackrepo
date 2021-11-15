@@ -27,7 +27,7 @@ const Authors = (props) => {
 
     addBorn({ variables: { name, setBornTo: born }})
     
-    setName('Robert Martin')
+    setName('')
     setBorn('')
   }
 
@@ -59,7 +59,7 @@ const Authors = (props) => {
         <label>
           name
           <select value={name} onChange={({ target }) => setName(target.value)}>
-            {authors.map(a => <option value={a.name}>{a.name}</option> )}
+            {authors.map(a => <option key={a.name} value={a.name}>{a.name}</option> )}
           </select>
         </label>
         <div>
