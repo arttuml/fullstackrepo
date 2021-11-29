@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { useMutation } from '@apollo/client'
-import { LOGIN } from '../queries'
+import { useMutation, useLazyQuery } from '@apollo/client'
+import { LOGIN, ME } from '../queries'
 
 const LoginForm = ({ setPage, setToken, show }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   
   const [ login, result ] = useMutation(LOGIN)
+  const [currentUser, _] = useLazyQuery(ME, {
+    fetchPolicy: 'network-only'
+  })
 
   useEffect(() => {
     if ( result.data ) {
@@ -14,6 +17,7 @@ const LoginForm = ({ setPage, setToken, show }) => {
       setToken(token)
       localStorage.setItem('user-token', token)
       setPage('authors')
+      currentUser()
       setUsername('')
       setPassword('')
     }

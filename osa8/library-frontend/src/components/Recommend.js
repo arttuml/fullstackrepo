@@ -13,7 +13,6 @@ const Recommend = (props) => {
     return null
   }
   
-  
   const favoriteGenre = favoriteGenreResult.data.me.favoriteGenre
   const books = result.data.allBooks.filter(a => a.genres.includes(favoriteGenre))
 
